@@ -1,4 +1,6 @@
-export const coursesList = [
+import { Course } from "@/lib/courses";
+
+export const coursesList: Course[] = [
   // {
   //   id: "react-fundamentals",
   //   title: "React Fundamentals",

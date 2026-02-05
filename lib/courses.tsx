@@ -1,4 +1,4 @@
-import { coursesList } from "@/content/courses/courses";
+import { coursesList } from "@/content/courses";
 export interface Note {
   id: string;
   title: string;

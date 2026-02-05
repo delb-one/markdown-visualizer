@@ -17,7 +17,7 @@ Each course is represented by a dedicated folder containing `.md` lesson files a
 
 ## 🗂️ Courses Configuration (`courses.js`)
 
-The file `content/courses/courses.js` exports a list of courses with the following structure:
+The file `content/courses.js` exports a list of courses with the following structure:
 
 ```js
 export const coursesList = [
