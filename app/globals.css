@@ -393,10 +393,6 @@
   margin-top: 1.7142857em;
   margin-bottom: 1.7142857em;
   border-radius: 0.375rem;
-  padding-top: 0.8571429em;
-  padding-right: 1.1428571em;
-  padding-bottom: 0.8571429em;
-  padding-left: 1.1428571em;
   font-family: var(--font-mono);
 }
 
@@ -526,3 +522,9 @@
 .dark .prose pre .comment { color: oklch(0.5 0 0); font-style: italic; }
 .dark .prose pre .function { color: oklch(0.75 0.12 220); }
 .dark .prose pre .operator { color: oklch(0.7 0.12 30); }
+
+
+.dark .hljs {
+  background: #0d1117;
+  color: #c9d1d9;
+}

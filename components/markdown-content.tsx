@@ -7,6 +7,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
+import "highlight.js/styles/github.css";
+// import "highlight.js/styles/github-dark.css";
 
 interface MarkdownContentProps {
   content: string;
@@ -124,26 +126,35 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
                   );
                 },
                 code: ({ className, children, ...props }) => {
-                  const match = /language-(\w+)/.exec(className || "");
-                  const isInline = !className && !match;
-                  return isInline ? (
+                  const isInline = !className;
+
+                  if (isInline) {
+                    return (
+                      <code
+                        className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
+                        {...props}
+                      >
+                        {children}
+                      </code>
+                    );
+                  }
+
+                  return (
                     <code
-                      className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground before:content-none after:content-none "
+                      className={`${className} font-mono text-sm`}
                       {...props}
                     >
                       {children}
                     </code>
-                  ) : (
-                    <code className={`${className || ""} font-mono`} {...props}>
-                      {children}
-                    </code>
                   );
                 },
+
                 pre: ({ children }) => (
-                  <pre className="overflow-x-auto rounded-lg border border-l-green-400 bg-muted/50 p-4 font-mono text-sm border-l-2 ">
+                  <pre className="group relative overflow-x-auto rounded-md border bg-[#f6f8fa]  text-sm dark:bg-[#0d1117]">
                     {children}
                   </pre>
                 ),
+
                 table: ({ children }) => (
                   <div className="overflow-x-auto rounded-lg border border-border">
                     <table className="w-full">{children}</table>
