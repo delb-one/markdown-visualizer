@@ -8,6 +8,7 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import "highlight.js/styles/github.css";
+import { CodeBlock } from "./code-block";
 // import "highlight.js/styles/github-dark.css";
 
 interface MarkdownContentProps {
@@ -149,11 +150,7 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
                   );
                 },
 
-                pre: ({ children }) => (
-                  <pre className="group relative overflow-x-auto rounded-md border bg-[#f6f8fa]  text-sm dark:bg-[#0d1117]">
-                    {children}
-                  </pre>
-                ),
+                pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
 
                 table: ({ children }) => (
                   <div className="overflow-x-auto rounded-lg border border-border">
