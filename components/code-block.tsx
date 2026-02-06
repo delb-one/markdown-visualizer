@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Check, Copy } from "lucide-react"
 
 interface CodeBlockProps {
@@ -8,12 +8,13 @@ interface CodeBlockProps {
 }
 
 export function CodeBlock({ children }: CodeBlockProps) {
+  const preRef = useRef<HTMLPreElement>(null)
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
-    const code = typeof children === "string"
-      ? children
-      : (children as any)?.props?.children?.toString() ?? ""
+    if (!preRef.current) return
+
+    const code = preRef.current.textContent ?? ""
 
     await navigator.clipboard.writeText(code)
     setCopied(true)
@@ -43,7 +44,7 @@ export function CodeBlock({ children }: CodeBlockProps) {
       </button>
 
       {/* Code block */}
-      <pre className="overflow-x-auto rounded-md border bg-[#f6f8fa] text-sm leading-6 dark:border-neutral-800 dark:bg-[#0d1117]">
+      <pre ref={preRef} className="group relative overflow-x-auto rounded-md border bg-[#f6f8fa]  text-sm dark:bg-[#0d1117]">
         {children}
       </pre>
     </div>
