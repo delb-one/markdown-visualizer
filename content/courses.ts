@@ -80,6 +80,18 @@ export const coursesList: Course[] = [
   //   ],
   // },
   {
+    id: "nextjs-fundamentals",
+    title: "Next.js Fundamentals",
+    description: "Core concepts of Next.js development",
+    notes: [
+      {
+        id: "layouts-and-pages",
+        title: "Layouts and Pages",
+        fileName: "layouts-and-pages.md",
+      },
+    ],
+  },
+  {
     id: "linux-fundamentals",
     title: "Linux Fundamentals",
     description: "Basics of Linux operating system",
