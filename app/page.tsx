@@ -67,7 +67,7 @@ export default function Home() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Header */}
         <header className="flex h-14 items-center justify-between border-b border-border px-4">
           <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export default function Home() {
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-hidden">
+        <main className="min-w-0 flex-1 overflow-hidden">
           {selectedNote ? (
             isLoading ? (
               <div className="flex h-full items-center justify-center">

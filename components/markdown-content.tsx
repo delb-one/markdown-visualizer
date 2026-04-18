@@ -6,7 +6,6 @@ import { useMemo, useRef, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
-import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import "highlight.js/styles/github.css";
 import { CodeBlock } from "./code-block";
 // import "highlight.js/styles/github-dark.css";
@@ -88,10 +87,12 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
   }, [headings]);
 
   return (
-    <div className="flex h-full">
-      <ScrollAreaPrimitive.Root className="relative flex-1 overflow-hidden">
-        <ScrollAreaPrimitive.Viewport ref={scrollAreaRef} className="h-full">
-          <article className="prose p-8 lg:p-12">
+    <div className="flex h-full min-w-0">
+      <div
+        ref={scrollAreaRef}
+        className="min-w-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+          <article className="prose min-w-0 max-w-full p-8 lg:p-8">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeHighlight]}
@@ -132,7 +133,7 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
                   if (isInline) {
                     return (
                       <code
-                        className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
+                        className="break-all rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
                         {...props}
                       >
                         {children}
@@ -153,8 +154,8 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
                 pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
 
                 table: ({ children }) => (
-                  <div className="overflow-x-auto rounded-lg border border-border">
-                    <table className="w-full">{children}</table>
+                  <div className="max-w-full overflow-x-auto rounded-lg border border-border">
+                    <table className="w-full mt-0! mb-0!">{children}</table>
                   </div>
                 ),
                 th: ({ children }) => (
@@ -180,11 +181,13 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
                     {children}
                   </ol>
                 ),
-                li: ({ children }) => <li className="leading-7">{children}</li>,
+                li: ({ children }) => (
+                  <li className="wrap-break-word leading-7">{children}</li>
+                ),
                 a: ({ href, children }) => (
                   <a
                     href={href}
-                    className="font-medium text-primary underline underline-offset-4 hover:text-primary/80"
+                    className="wrap-break-word font-medium text-primary underline underline-offset-4 hover:text-primary/80"
                     target={href?.startsWith("http") ? "_blank" : undefined}
                     rel={
                       href?.startsWith("http")
@@ -196,7 +199,7 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
                   </a>
                 ),
                 p: ({ children }) => (
-                  <p className="leading-7 not-first:mt-6">{children}</p>
+                  <p className="wrap-break-word leading-7 not-first:mt-6">{children}</p>
                 ),
                 hr: () => <hr className="my-8 border-border" />,
               }}
@@ -204,9 +207,7 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
               {content}
             </ReactMarkdown>
           </article>
-        </ScrollAreaPrimitive.Viewport>
-        <ScrollAreaPrimitive.Scrollbar orientation="vertical" />
-      </ScrollAreaPrimitive.Root>
+      </div>
 
       {headings.length > 1 && (
         <aside className="hidden w-56 shrink-0 border-l border-border p-6 xl:block">
