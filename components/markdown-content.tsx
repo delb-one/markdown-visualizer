@@ -42,11 +42,15 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
   );
 
   const headings = useMemo(() => {
+    const contentWithoutFencedCode = content.replace(
+      /```[\s\S]*?```|~~~[\s\S]*?~~~/g,
+      "",
+    );
     const regex = /^#{1,3}\s+(.+)$/gm;
     const matches: { level: number; text: string; id: string }[] = [];
     let match;
 
-    while ((match = regex.exec(content)) !== null) {
+    while ((match = regex.exec(contentWithoutFencedCode)) !== null) {
       const level = match[0].indexOf(" ");
       const text = match[1];
       const id = text.toLowerCase().replace(/[^\w]+/g, "-");
@@ -92,7 +96,7 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
         ref={scrollAreaRef}
         className="min-w-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-          <article className="prose min-w-0 max-w-full p-8 lg:p-8">
+          <article className="prose min-w-0 max-w-full px-8 pb-8 pt-20 lg:px-8 lg:pb-8 lg:pt-20">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeHighlight]}
@@ -211,7 +215,7 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
 
       {headings.length > 1 && (
         <aside className="hidden w-56 shrink-0 border-l border-border p-6 xl:block">
-          <h4 className="mb-4 text-sm font-semibold text-foreground">
+          <h4 className="mb-4 mt-10 text-sm font-semibold text-foreground">
             On this page
           </h4>
           <nav className="space-y-2">

@@ -67,9 +67,9 @@ export default function Home() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Header */}
-        <header className="flex h-14 items-center justify-between border-b border-border px-4">
+        <header className="absolute inset-x-0 top-0 z-20 flex h-14 items-center justify-between border-b border-border/70 bg-background/60 px-4 backdrop-blur-md">
           <div className="flex items-center gap-2">
             <MobileSidebar
               courses={courses}

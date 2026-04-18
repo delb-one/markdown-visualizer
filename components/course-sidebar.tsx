@@ -10,7 +10,11 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Course, Note } from "@/lib/courses";
 
@@ -73,16 +77,47 @@ export function CourseSidebar({
         })),
       );
 
-  if (collapsed) {
-    return (
-      <div className="flex h-full flex-col border-r border-border bg-sidebar">
-        <div className="border-b border-sidebar-border p-4">
-          <div className="flex items-center justify-center">
-            <BookOpen className="h-5 w-5 text-sidebar-foreground" />
-          </div>
+  return (
+    <div className="flex h-full flex-col border-r border-border bg-sidebar">
+      <div
+        className={cn(
+          "border-b",
+          collapsed
+            ? "h-14 border-sidebar-border/70 p-4"
+            : "border-sidebar-border p-4",
+        )}
+      >
+        <div
+          className={cn(
+            "relative flex h-6 items-center",
+            collapsed && "justify-center",
+          )}
+        >
+          <BookOpen className="h-5 w-5 shrink-0 text-sidebar-foreground" />
+          <h1
+            className={cn(
+              "ml-2 whitespace-nowrap font-semibold text-sidebar-foreground transition-opacity duration-150",
+              collapsed && "pointer-events-none absolute opacity-0",
+            )}
+          >
+            Course Notes
+          </h1>
         </div>
+        {!collapsed && (
+          <div className="relative mt-4">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search notes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 bg-sidebar-accent border-sidebar-border text-sidebar-foreground placeholder:text-muted-foreground"
+            />
+          </div>
+        )}
+      </div>
 
-        <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1">
+        {collapsed ? (
           <div className="flex flex-col items-center gap-1 p-2">
             {collapsedItems.map(({ course, note, chapterNumber }) => (
               <Tooltip key={`${course.id}-${note.id}`}>
@@ -110,86 +145,61 @@ export function CourseSidebar({
               </Tooltip>
             ))}
           </div>
-        </ScrollArea>
-      </div>
-    );
-  }
+        ) : (
+          <div className="p-2">
+            {filteredCourses.map((course) => (
+              <div key={course.id} className="mb-1">
+                <button
+                  onClick={() => {
+                    toggleCourse(course.id);
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    selectedCourse?.id === course.id && !selectedNote
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground",
+                  )}
+                >
+                  {expandedCourses.has(course.id) ? (
+                    <ChevronDown className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 shrink-0" />
+                  )}
+                  <BookOpen className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{course.title}</span>
+                </button>
 
-  return (
-    <div className="flex h-full flex-col border-r border-border bg-sidebar">
-      <div className="p-4 border-b border-sidebar-border">
-        <div className="flex items-center gap-2 mb-4">
-          <BookOpen className="h-5 w-5 text-sidebar-foreground" />
-          <h1 className="font-semibold text-sidebar-foreground">
-            Course Notes
-          </h1>
-        </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-sidebar-accent border-sidebar-border text-sidebar-foreground placeholder:text-muted-foreground"
-          />
-        </div>
-      </div>
-
-      <ScrollArea className="flex-1">
-        <div className="p-2">
-          {filteredCourses.map((course) => (
-            <div key={course.id} className="mb-1">
-              <button
-                onClick={() => {
-                  onSelectCourse(course);
-                  toggleCourse(course.id);
-                }}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  selectedCourse?.id === course.id && !selectedNote
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground",
+                {expandedCourses.has(course.id) && (
+                  <div className="ml-4 mt-1 space-y-1">
+                    {course.notes.map((note) => (
+                      <button
+                        key={note.id}
+                        onClick={() => onSelectNote(course, note)}
+                        className={cn(
+                          "flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+                          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                          selectedNote?.id === note.id
+                            ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                            : "text-muted-foreground",
+                        )}
+                      >
+                        <FileText className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{note.title}</span>
+                      </button>
+                    ))}
+                  </div>
                 )}
-              >
-                {expandedCourses.has(course.id) ? (
-                  <ChevronDown className="h-4 w-4 shrink-0" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 shrink-0" />
-                )}
-                <BookOpen className="h-4 w-4 shrink-0" />
-                <span className="truncate">{course.title}</span>
-              </button>
+              </div>
+            ))}
 
-              {expandedCourses.has(course.id) && (
-                <div className="ml-4 mt-1 space-y-1">
-                  {course.notes.map((note) => (
-                    <button
-                      key={note.id}
-                      onClick={() => onSelectNote(course, note)}
-                      className={cn(
-                        "flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
-                        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                        selectedNote?.id === note.id
-                          ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                          : "text-muted-foreground",
-                      )}
-                    >
-                      <FileText className="h-3.5 w-3.5 shrink-0" />
-                      <span className="truncate">{note.title}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-
-          {filteredCourses.length === 0 && (
-            <p className="px-3 py-8 text-center text-sm text-muted-foreground">
-              No notes found
-            </p>
-          )}
-        </div>
+            {filteredCourses.length === 0 && (
+              <p className="px-3 py-8 text-center text-sm text-muted-foreground">
+                No notes found
+              </p>
+            )}
+          </div>
+        )}
       </ScrollArea>
     </div>
   );
