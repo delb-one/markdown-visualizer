@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react"
 import { CourseSidebar } from "@/components/course-sidebar"
 import { MarkdownContent } from "@/components/markdown-content"
 import { EmptyState } from "@/components/empty-state"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { MobileSidebar } from "@/components/mobile-sidebar"
+import { Button } from "@/components/ui/button"
 import { courses, getNoteContent, type Course, type Note } from "@/lib/courses"
 
 export default function Home() {
@@ -14,6 +16,7 @@ export default function Home() {
   const [noteContent, setNoteContent] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     async function loadContent() {
@@ -48,13 +51,18 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-72 shrink-0 lg:block">
+      <aside
+        className={`hidden shrink-0 transition-[width] duration-200 lg:block ${
+          sidebarCollapsed ? "w-20" : "w-72"
+        }`}
+      >
         <CourseSidebar
           courses={courses}
           selectedCourse={selectedCourse}
           selectedNote={selectedNote}
           onSelectCourse={handleSelectCourse}
           onSelectNote={handleSelectNote}
+          collapsed={sidebarCollapsed}
         />
       </aside>
 
@@ -72,6 +80,21 @@ export default function Home() {
               open={mobileOpen}
               onOpenChange={setMobileOpen}
             />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden lg:inline-flex"
+              onClick={() => setSidebarCollapsed((prev) => !prev)}
+              aria-label={
+                sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+              }
+            >
+              {sidebarCollapsed ? (
+                <PanelLeftOpen className="h-5 w-5" />
+              ) : (
+                <PanelLeftClose className="h-5 w-5" />
+              )}
+            </Button>
             {selectedNote && (
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">

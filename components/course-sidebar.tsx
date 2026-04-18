@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Course, Note } from "@/lib/courses";
 
@@ -19,6 +20,7 @@ interface CourseSidebarProps {
   selectedNote: Note | null;
   onSelectCourse: (course: Course) => void;
   onSelectNote: (course: Course, note: Note) => void;
+  collapsed?: boolean;
 }
 
 export function CourseSidebar({
@@ -27,6 +29,7 @@ export function CourseSidebar({
   selectedNote,
   onSelectCourse,
   onSelectNote,
+  collapsed = false,
 }: CourseSidebarProps) {
   const [expandedCourses, setExpandedCourses] = useState<Set<string>>(
     new Set(selectedCourse ? [selectedCourse.id] : []),
@@ -56,6 +59,62 @@ export function CourseSidebar({
         course.notes.length > 0,
     );
 
+  const collapsedItems = selectedCourse
+    ? selectedCourse.notes.map((note, noteIndex) => ({
+        course: selectedCourse,
+        note,
+        chapterNumber: `${noteIndex + 1}`,
+      }))
+    : courses.flatMap((course, courseIndex) =>
+        course.notes.map((note, noteIndex) => ({
+          course,
+          note,
+          chapterNumber: `${courseIndex + 1}.${noteIndex + 1}`,
+        })),
+      );
+
+  if (collapsed) {
+    return (
+      <div className="flex h-full flex-col border-r border-border bg-sidebar">
+        <div className="border-b border-sidebar-border p-4">
+          <div className="flex items-center justify-center">
+            <BookOpen className="h-5 w-5 text-sidebar-foreground" />
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="flex flex-col items-center gap-1 p-2">
+            {collapsedItems.map(({ course, note, chapterNumber }) => (
+              <Tooltip key={`${course.id}-${note.id}`}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => onSelectNote(course, note)}
+                    className={cn(
+                      "flex size-10 items-center justify-center rounded-md transition-colors",
+                      "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                      selectedNote?.id === note.id
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                        : "text-muted-foreground",
+                    )}
+                    aria-label={`${course.title} - ${note.title}`}
+                  >
+                    <span className="text-[11px] font-semibold leading-none">
+                      {chapterNumber}
+                    </span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8}>
+                  <p className="font-medium">{note.title}</p>
+                  <p className="text-[11px] opacity-80">{course.title}</p>
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full flex-col border-r border-border bg-sidebar">
       <div className="p-4 border-b border-sidebar-border">
@@ -82,6 +141,7 @@ export function CourseSidebar({
             <div key={course.id} className="mb-1">
               <button
                 onClick={() => {
+                  onSelectCourse(course);
                   toggleCourse(course.id);
                 }}
                 className={cn(
