@@ -7,6 +7,9 @@ import {
   BookOpen,
   FileText,
   Search,
+  Book,
+  LibraryBig,
+  Library,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -39,6 +42,9 @@ export function CourseSidebar({
     new Set(selectedCourse ? [selectedCourse.id] : []),
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedCollapsedCourses, setExpandedCollapsedCourses] = useState<
+    Set<string>
+  >(new Set());
 
   const toggleCourse = (courseId: string) => {
     const newExpanded = new Set(expandedCourses);
@@ -62,20 +68,23 @@ export function CourseSidebar({
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         course.notes.length > 0,
     );
-
   const collapsedItems = selectedCourse
     ? selectedCourse.notes.map((note, noteIndex) => ({
         course: selectedCourse,
         note,
         chapterNumber: `${noteIndex + 1}`,
       }))
-    : courses.flatMap((course, courseIndex) =>
-        course.notes.map((note, noteIndex) => ({
-          course,
-          note,
-          chapterNumber: `${courseIndex + 1}.${noteIndex + 1}`,
-        })),
-      );
+    : [];
+
+  const toggleCollapsedCourse = (courseId: string) => {
+    const nextExpanded = new Set(expandedCollapsedCourses);
+    if (nextExpanded.has(courseId)) {
+      nextExpanded.delete(courseId);
+    } else {
+      nextExpanded.add(courseId);
+    }
+    setExpandedCollapsedCourses(nextExpanded);
+  };
 
   return (
     <div className="flex h-full flex-col border-r border-border bg-sidebar">
@@ -93,7 +102,7 @@ export function CourseSidebar({
             collapsed && "justify-center",
           )}
         >
-          <BookOpen className="h-5 w-5 shrink-0 text-sidebar-foreground" />
+          <Library className="h-5 w-5 shrink-0 text-sidebar-foreground" />
           <h1
             className={cn(
               "ml-2 whitespace-nowrap font-semibold text-sidebar-foreground transition-opacity duration-150",
@@ -119,30 +128,76 @@ export function CourseSidebar({
       <ScrollArea className="flex-1">
         {collapsed ? (
           <div className="flex flex-col items-center gap-1 p-2">
-            {collapsedItems.map(({ course, note, chapterNumber }) => (
-              <Tooltip key={`${course.id}-${note.id}`}>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => onSelectNote(course, note)}
-                    className={cn(
-                      "flex size-10 items-center justify-center rounded-md transition-colors",
-                      "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                      selectedNote?.id === note.id
-                        ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                        : "text-muted-foreground",
-                    )}
-                    aria-label={`${course.title} - ${note.title}`}
-                  >
-                    <span className="text-[11px] font-semibold leading-none">
-                      {chapterNumber}
-                    </span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={8}>
-                  <p className="font-medium">{note.title}</p>
-                  <p className="text-[11px] opacity-80">{course.title}</p>
-                </TooltipContent>
-              </Tooltip>
+            {courses.map((course) => (
+              <div
+                key={course.id}
+                className="flex w-full flex-col items-center"
+              >
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => toggleCollapsedCourse(course.id)}
+                      className={cn(
+                        "flex h-10 w-full items-center justify-center gap-1 rounded-md transition-colors ",
+                        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                        expandedCollapsedCourses.has(course.id)
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                          : "text-muted-foreground",
+                      )}
+                      aria-label={`Toggle notes for ${course.title}`}
+                    >
+                      <span className="text-[11px] font-semibold leading-none">
+                        {expandedCollapsedCourses.has(course.id) ? (
+                          <BookOpen className="h-4 w-4 shrink-0" />
+                        ) : (
+                          <Book className="h-4 w-4 shrink-0" />
+                        )}{" "}
+                      </span>
+                      {/* {expandedCollapsedCourses.has(course.id) ? (
+                        <ChevronDown className="h-3 w-3 shrink-0" />
+                      ) : (
+                        <ChevronRight className="h-3 w-3 shrink-0" />
+                      )} */}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" sideOffset={8}>
+                    <p className="font-medium">{course.title}</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                {expandedCollapsedCourses.has(course.id) && (
+                  <div className="mt-1 flex w-full flex-col items-center gap-2">
+                    {course.notes.map((note, noteIndex) => (
+                      <Tooltip key={`${course.id}-${note.id}`}>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => onSelectNote(course, note)}
+                            className={cn(
+                              "flex size-10 items-center justify-center rounded-md transition-colors",
+                              "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                              selectedNote?.id === note.id
+                                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                                : "text-muted-foreground",
+                            )}
+                            aria-label={`${course.title} - ${note.title}`}
+                          >
+                            <span className="text-[11px] font-semibold leading-none">
+                              {/* <FileText className="h-3.5 w-3.5 shrink-0" />{" "} */}
+                              {noteIndex + 1}
+                            </span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={8}>
+                          <p className="font-medium">{note.title}</p>
+                          <p className="text-[11px] opacity-80">
+                            {course.title}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         ) : (
