@@ -1,0 +1,71 @@
+[
+  {
+    "id": "linux-fundamentals",
+    "title": "Linux Fundamentals",
+    "description": "Basics of Linux operating system",
+    "notes": [
+      {
+        "id": "introduction",
+        "title": "Introduction",
+        "fileName": "introduction.md"
+      },
+      {
+        "id": "the-shell",
+        "title": "The Shell",
+        "fileName": "the-shell.md"
+      }
+    ]
+  },
+  {
+    "id": "docker-workshop",
+    "title": "Docker Workshop",
+    "description": "Hands-on experience with Docker",
+    "notes": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "fileName": "1-overview.md"
+      },
+      {
+        "id": "containerize-app",
+        "title": "Containerize an application",
+        "fileName": "2-containerize-app.md"
+      },
+      {
+        "id": "update-app",
+        "title": "Update the application",
+        "fileName": "3-update-app.md"
+      },
+      {
+        "id": "share-app",
+        "title": "Share the application",
+        "fileName": "4-share-app.md"
+      },
+      {
+        "id": "persist-data",
+        "title": "Persist the DB",
+        "fileName": "5-persist-data.md"
+      },
+      {
+        "id": "multi-container-apps",
+        "title": "Multi container apps",
+        "fileName": "6-multi-container-apps.md"
+      },
+      {
+        "id": "use-bind-mounts",
+        "title": "Use bind mounts",
+        "fileName": "7-use-bind-mounts.md"
+      },
+      {
+        "id": "docker-compose",
+        "title": "Docker Compose",
+        "fileName": "8-docker-compose.md"
+      },
+      {
+        "id": "best-practice",
+        "title": "Image-building best practices",
+        "fileName": "9-best-practice.md"
+      }
+    ]
+  }
+]

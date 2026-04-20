@@ -10,35 +10,35 @@ Each course is represented by a dedicated folder containing `.md` lesson files a
 
 - Each **course** is a folder inside `content/courses`
 - Each **lesson** is a `.md` file
-- Navigation and content loading are driven by `courses.ts`
-- Markdown file names **must match** the ones defined in `courses.ts`
+- Navigation and content loading are driven by `courses.json`
+- Markdown file names **must match** the ones defined in `courses.json`
 
 
 
-## 🗂️ Courses Configuration (`courses.ts`)
+## 🗂️ Courses Configuration (`courses.json`)
 
-The file `content/courses.ts` exports a list of courses with the following structure:
+The file `content/courses.json` contains a list of courses with the following structure:
 
-```ts
-export const coursesList: Course[] = [
+```json
+[
   {
-    id: "linux-fundamentals",
-    title: "Linux Fundamentals",
-    description: "Basics of Linux operating system",
-    notes: [
+    "id": "linux-fundamentals",
+    "title": "Linux Fundamentals",
+    "description": "Basics of Linux operating system",
+    "notes": [
       {
-        id: "introduction",
-        title: "Introduction",
-        fileName: "introduction.md",
+        "id": "introduction",
+        "title": "Introduction",
+        "fileName": "introduction.md"
       },
       {
-        id: "the-shell",
-        title: "The Shell",
-        fileName: "the-shell.md",
-      },
-    ],
-  },
-];
+        "id": "the-shell",
+        "title": "The Shell",
+        "fileName": "the-shell.md"
+      }
+    ]
+  }
+]
 ```
 
 
@@ -73,20 +73,3 @@ export const coursesList: Course[] = [
 
 
 
-## ➕ Adding a New Course
-
-To add a new course:
-
-1. Create a new folder inside `content/courses`
-2. Add one or more `.md` lesson files
-3. Register the course inside `courses.ts`
-
-That’s it — no additional configuration required 🎉
-
-
-
-## 🚀 Ready to Go
-
-Once the Markdown files are added and `courses.ts` is updated, the course will automatically be available in the app.
-
-Happy writing ✍️

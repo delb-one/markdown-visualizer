@@ -1,4 +1,4 @@
-import { coursesList } from "@/content/courses";
+import coursesData from "@/content/courses.json";
 export interface Note {
   id: string;
   title: string;
@@ -12,7 +12,7 @@ export interface Course {
   notes: Note[];
 }
 
-export const courses: Course[] = coursesList;
+export const courses: Course[] = coursesData;
 
 export async function getNoteContent(
   courseId: string,

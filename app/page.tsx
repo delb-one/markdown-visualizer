@@ -1,22 +1,36 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { PanelLeftClose, PanelLeftOpen, Pencil } from "lucide-react"
 import { CourseSidebar } from "@/components/course-sidebar"
 import { MarkdownContent } from "@/components/markdown-content"
 import { EmptyState } from "@/components/empty-state"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Button } from "@/components/ui/button"
-import { courses, getNoteContent, type Course, type Note } from "@/lib/courses"
+import { courses as initialCourses, getNoteContent, type Course, type Note } from "@/lib/courses"
+import { LessonEditor } from "@/components/lesson-editor"
 
 export default function Home() {
+  const [coursesList, setCoursesList] = useState<Course[]>(initialCourses)
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [noteContent, setNoteContent] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+
+  const reloadCourses = async () => {
+    try {
+      const res = await fetch('/api/courses')
+      if (res.ok) {
+        setCoursesList(await res.json())
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   useEffect(() => {
     async function loadContent() {
@@ -28,6 +42,7 @@ export default function Home() {
         )
         setNoteContent(content)
         setIsLoading(false)
+        setIsEditing(false)
       }
     }
     loadContent()
@@ -57,11 +72,12 @@ export default function Home() {
         }`}
       >
         <CourseSidebar
-          courses={courses}
+          courses={coursesList}
           selectedCourse={selectedCourse}
           selectedNote={selectedNote}
           onSelectCourse={handleSelectCourse}
           onSelectNote={handleSelectNote}
+          onCoursesChange={reloadCourses}
           collapsed={sidebarCollapsed}
         />
       </aside>
@@ -72,7 +88,7 @@ export default function Home() {
         <header className="absolute inset-x-0 top-0 z-20 flex h-14 items-center justify-between border-b border-border/70 bg-background/60 px-4 backdrop-blur-md">
           <div className="flex items-center gap-2">
             <MobileSidebar
-              courses={courses}
+              courses={coursesList}
               selectedCourse={selectedCourse}
               selectedNote={selectedNote}
               onSelectCourse={handleSelectCourse}
@@ -107,16 +123,35 @@ export default function Home() {
               </div>
             )}
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            {selectedNote && !isEditing && (
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                <Pencil className="w-4 h-4 mr-2" />
+                Edit
+              </Button>
+            )}
+            <ThemeToggle />
+          </div>
         </header>
 
         {/* Content Area */}
-        <main className="min-w-0 flex-1 overflow-hidden">
+        <main className="min-w-0 flex-1 overflow-hidden z-10 relative">
           {selectedNote ? (
             isLoading ? (
               <div className="flex h-full items-center justify-center">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-foreground" />
               </div>
+            ) : isEditing ? (
+              <LessonEditor
+                courseId={selectedCourse!.id}
+                fileName={selectedNote.fileName}
+                initialContent={noteContent}
+                onSave={(newContent) => {
+                  setNoteContent(newContent)
+                  setIsEditing(false)
+                }}
+                onCancel={() => setIsEditing(false)}
+              />
             ) : (
               <MarkdownContent
                 content={noteContent}

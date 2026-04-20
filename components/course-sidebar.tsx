@@ -20,6 +20,10 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Course, Note } from "@/lib/courses";
+import { CourseManager } from "@/components/course-manager";
+import { LessonManager } from "@/components/lesson-manager";
+import { DeleteCourseDialog } from "@/components/delete-course-dialog";
+import { DeleteLessonDialog } from "@/components/delete-lesson-dialog";
 
 interface CourseSidebarProps {
   courses: Course[];
@@ -27,6 +31,7 @@ interface CourseSidebarProps {
   selectedNote: Note | null;
   onSelectCourse: (course: Course) => void;
   onSelectNote: (course: Course, note: Note) => void;
+  onCoursesChange?: () => void;
   collapsed?: boolean;
 }
 
@@ -36,6 +41,7 @@ export function CourseSidebar({
   selectedNote,
   onSelectCourse,
   onSelectNote,
+  onCoursesChange = () => {},
   collapsed = false,
 }: CourseSidebarProps) {
   const [expandedCourses, setExpandedCourses] = useState<Set<string>>(
@@ -90,7 +96,7 @@ export function CourseSidebar({
     <div className="flex h-full flex-col border-r border-border bg-sidebar">
       <div
         className={cn(
-          "border-b",
+          "border-b group",
           collapsed
             ? "h-14 border-sidebar-border/70 p-4"
             : "border-sidebar-border p-4",
@@ -111,6 +117,11 @@ export function CourseSidebar({
           >
             Course Notes
           </h1>
+          {!collapsed && (
+            <div className="ml-auto flex items-center pr-1  group-hover:opacity-100 transition-opacity">
+              <CourseManager onSuccess={onCoursesChange} />
+            </div>
+          )}
         </div>
         {!collapsed && (
           <div className="relative mt-4">
@@ -203,45 +214,56 @@ export function CourseSidebar({
         ) : (
           <div className="p-2">
             {filteredCourses.map((course) => (
-              <div key={course.id} className="mb-1">
-                <button
-                  onClick={() => {
-                    toggleCourse(course.id);
-                  }}
+              <div key={course.id} className="mb-1 group/course">
+                <div
                   className={cn(
-                    "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    "flex w-full items-center gap-2 rounded-md pr-1 transition-colors",
                     selectedCourse?.id === course.id && !selectedNote
                       ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground",
+                      : "hover:bg-sidebar-accent/50 text-sidebar-foreground",
                   )}
                 >
-                  {expandedCourses.has(course.id) ? (
-                    <ChevronDown className="h-4 w-4 shrink-0" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4 shrink-0" />
-                  )}
-                  <BookOpen className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{course.title}</span>
-                </button>
+                  <button
+                    onClick={() => {
+                      toggleCourse(course.id);
+                    }}
+                    className="flex flex-1 items-center gap-2 pl-3 py-2 text-sm font-medium"
+                  >
+                    {expandedCourses.has(course.id) ? (
+                      <ChevronDown className="h-4 w-4 shrink-0" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 shrink-0" />
+                    )}
+                    <BookOpen className="h-4 w-4 shrink-0" />
+                    <span className="truncate flex-1 text-left">{course.title}</span>
+                  </button>
+                  <div className="opacity-0 group-hover/course:opacity-100 transition-opacity flex items-center pr-1">
+                    <LessonManager course={course} onSuccess={onCoursesChange} />
+                    <DeleteCourseDialog course={course} onSuccess={onCoursesChange} />
+                  </div>
+                </div>
 
                 {expandedCourses.has(course.id) && (
                   <div className="ml-4 mt-1 space-y-1">
                     {course.notes.map((note) => (
-                      <button
-                        key={note.id}
-                        onClick={() => onSelectNote(course, note)}
-                        className={cn(
-                          "flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
-                          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                          selectedNote?.id === note.id
-                            ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                            : "text-muted-foreground",
-                        )}
-                      >
-                        <FileText className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">{note.title}</span>
-                      </button>
+                      <div key={note.id} className="group/lesson flex w-full items-center pr-2">
+                        <button
+                          onClick={() => onSelectNote(course, note)}
+                          className={cn(
+                            "flex flex-1 items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+                            "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                            selectedNote?.id === note.id
+                              ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                              : "text-muted-foreground",
+                          )}
+                        >
+                          <FileText className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{note.title}</span>
+                        </button>
+                        <div className="opacity-0 group-hover/lesson:opacity-100 transition-opacity">
+                          <DeleteLessonDialog course={course} lesson={note} onSuccess={onCoursesChange} />
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
