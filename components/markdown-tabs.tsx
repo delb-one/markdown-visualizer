@@ -40,7 +40,7 @@ export function MarkdownTabs({ tabs, renderMarkdown }: MarkdownTabsProps) {
         ))}
       </div>
       {/* Tab content */}
-      <div className="p-1">
+      <div className="p-2">
         {renderMarkdown(tabs[activeIndex].content)}
       </div>
     </div>

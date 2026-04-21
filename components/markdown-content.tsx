@@ -30,7 +30,7 @@ type ContentSegment =
 
 // Parse the markdown content into segments
 function parseContentWithTabs(content: string): ContentSegment[] {
-  const lines = content.split("\n");
+  const lines = content.split(/\r?\n/);
   const segments: ContentSegment[] = [];
 
   let inTabsBlock = false;
@@ -76,7 +76,7 @@ function parseContentWithTabs(content: string): ContentSegment[] {
         let contentStr = currentTabContentBuffer.slice(start, end).join("\n");
 
         if (currentIndent > 0) {
-          const indentRegex = new RegExp(`^\\s{0,${currentIndent}}`, "gm");
+          const indentRegex = new RegExp(`^[ \\t]{0,${currentIndent}}`, "gm");
           contentStr = contentStr.replace(indentRegex, "");
         }
         tabs.push({ label: currentTabLabel, content: contentStr });
@@ -418,16 +418,16 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
           </blockquote>
         );
       },
-      ul: ({ children }) => (
-        <ul className="my-4 ml-6 list-disc space-y-2">{children}</ul>
+      ul: ({ children, node, ...props }) => (
+        <ul className="my-4 ml-6 list-disc space-y-2" {...props}>{children}</ul>
       ),
-      ol: ({ children }) => (
-        <ol className="my-4 ml-6 list-decimal space-y-2">{children}</ol>
+      ol: ({ children, node, ...props }) => (
+        <ol className="my-4 ml-6 list-decimal space-y-2" {...props}>{children}</ol>
       ),
-      li: ({ children }) => (
-        <li className="wrap-break-word leading-7">{children}</li>
+      li: ({ children, node, ...props }) => (
+        <li className="wrap-break-word leading-7" {...props}>{children}</li>
       ),
-      a: ({ href, children }) => (
+      a: ({ href, children, node, ...props }) => (
         <a
           href={href}
           className="wrap-break-word font-medium text-primary underline underline-offset-4 hover:text-primary/80"

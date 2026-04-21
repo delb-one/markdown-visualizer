@@ -14,7 +14,8 @@ export function CodeBlock({ children }: CodeBlockProps) {
   const handleCopy = async () => {
     if (!preRef.current) return
 
-    const code = preRef.current.textContent ?? ""
+    let code = preRef.current.textContent ?? ""
+    code = code.split('\n').map(line => line.replace(/^\$\s*/, '')).join('\n')
 
     await navigator.clipboard.writeText(code)
     setCopied(true)
