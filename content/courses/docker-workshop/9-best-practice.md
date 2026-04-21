@@ -189,7 +189,7 @@ In the previous Dockerfile example, it uses the `node:24-alpine` image to perfor
 into an nginx container.
 
 
-  > [!Tips]
+  > [!TIP]
   > This React example is for illustration purposes. The getting-started todo app is a `Node.js` backend application, not a React frontend.
 
 

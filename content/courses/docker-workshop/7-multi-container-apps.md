@@ -38,6 +38,7 @@ In the following steps, you'll create the network first and then attach the MySQ
 2. Start a MySQL container and attach it to the network. You're also going to define a few environment variables that the
    database will use to initialize the database. To learn more about the MySQL environment variables, see the "Environment Variables" section in the [MySQL Docker Hub listing](https://hub.docker.com/_/mysql/).
 
+   [tabs]
    **Mac / Linux / Git Bash**
 
 
@@ -77,7 +78,7 @@ In the following steps, you'll create the network first and then attach the MySQ
        mysql:8.0
    ```
    
-   
+   [/tabs]
    
    In the previous command, you can see the `--network-alias` flag. In a later section, you'll learn more about this flag.
 
@@ -199,6 +200,8 @@ You can now start your dev-ready container.
 
 1. Specify each of the previous environment variables, as well as connect the container to your app network. Make sure that you are in the `getting-started-app` directory when you run this command.
 
+
+   [tabs]
    **Mac / Linux**
 
 
@@ -218,6 +221,7 @@ You can now start your dev-ready container.
    **PowerShell**
 
 
+
    In Windows, run this command in PowerShell.
 
    ```powershell
@@ -233,6 +237,7 @@ You can now start your dev-ready container.
    ```
 
    **Command Prompt**
+
 
 
    In Windows, run this command in Command Prompt.
@@ -265,7 +270,7 @@ You can now start your dev-ready container.
      sh -c "npm install && npm run dev"
    ```
    
-   
+   [/tabs]
 
 2. If you look at the logs for the container (`docker logs -f <container-id>`), you should see a message similar to the following, which indicates it's
    using the mysql database.

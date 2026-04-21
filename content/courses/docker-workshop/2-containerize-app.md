@@ -112,6 +112,8 @@ At this point, you have a running todo list manager with a few items.
 
 If you take a quick look at your containers, you should see at least one container running that's using the `getting-started` image and on port `3000`. To see your containers, you can use the CLI or Docker Desktop's graphical interface.
 
+[tabs]
+**CLI**
 
 
 Run the `docker ps` command in a terminal to list your containers.
@@ -133,7 +135,7 @@ df784548666d        getting-started     "docker-entrypoint.s..." 2 minutes ago  
 
 In Docker Desktop, select the **Containers** tab to see a list of your containers.
 
-
+[/tabs]
 
 
 ## Summary

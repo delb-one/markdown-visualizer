@@ -47,14 +47,14 @@
         "fileName": "5-persist-data.md"
       },
       {
-        "id": "multi-container-apps",
-        "title": "Multi container apps",
-        "fileName": "6-multi-container-apps.md"
-      },
-      {
         "id": "use-bind-mounts",
         "title": "Use bind mounts",
-        "fileName": "7-use-bind-mounts.md"
+        "fileName": "6-use-bind-mounts.md"
+      },
+      {
+        "id": "multi-container-apps",
+        "title": "Multi container apps",
+        "fileName": "7-multi-container-apps.md"
       },
       {
         "id": "docker-compose",

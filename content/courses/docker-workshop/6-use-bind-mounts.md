@@ -52,6 +52,8 @@ filesystem you can share with containers. For details about accessing the settin
 3. Run the following command to start `bash` in an `ubuntu` container with a
    bind mount.
 
+
+   [tabs]
    **Mac / Linux**
 
 
@@ -79,13 +81,12 @@ filesystem you can share with containers. For details about accessing the settin
    **PowerShell**
 
 
-
    ```console
    $ docker run -it --mount "type=bind,src=.,target=/src" ubuntu bash
    ```
-   
-   
-   
+  [/tabs]
+
+  
    The `--mount type=bind` option tells Docker to create a bind mount, where `src` is the
    current working directory on your host machine (`getting-started-app`), and
    `target` is where that directory should appear inside the container (`/src`).
@@ -165,6 +166,8 @@ mount that does the following:
 
 You can use the CLI or Docker Desktop to run your container with a bind mount.
 
+
+[tabs]
 **Mac / Linux CLI**
 
 
@@ -393,7 +396,7 @@ Using sqlite database at /etc/todos/todo.db
 Listening on port 3000
 ```
 
-
+[/tabs]
 
 ### Develop your app with the development container
 

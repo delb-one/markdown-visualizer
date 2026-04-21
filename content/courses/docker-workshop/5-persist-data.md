@@ -80,6 +80,11 @@ You can create the volume and start the container using the CLI or Docker Deskto
 
 
 
+[tabs]
+**CLI**
+
+
+
 1. Create a volume by using the `docker volume create` command.
 
    ```console
@@ -141,7 +146,7 @@ To start the todo app container with the volume mounted:
 8. In **Container path**, specify `/etc/todos`.
 9. Select **Run**.
 
-
+[/tabs]
 
 ### Verify that the data persists
 

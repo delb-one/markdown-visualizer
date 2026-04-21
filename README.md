@@ -71,5 +71,40 @@ The file `content/courses.json` contains a list of courses with the following st
 - **fileName**  
   Markdown file name (**must exist inside the course folder**)
 
+## 📝 Markdown Features
 
+### Tab Groups
 
+You can create interactive tab groups inside your markdown lessons using the `[tabs]` and `[/tabs]` markers. 
+Each internal tab must start with the title wrapped in bold (`**Tab Name**`) on its own line:
+
+```markdown
+[tabs]
+**React**
+React component code here...
+
+**Vue**
+Vue component code here...
+[/tabs]
+```
+
+### Alert / Callout Blocks
+
+You can use GitHub-style alerts in your markdown to highlight important information. The following types are supported and will render with appropriate colors and icons:
+
+```markdown
+> [!NOTE]
+> Information that the user should take note of.
+
+> [!TIP]
+> Helpful advice for doing things better.
+
+> [!IMPORTANT]
+> Key information that users need to know.
+
+> [!WARNING]
+> Urgent info that needs immediate user attention.
+
+> [!CAUTION]
+> Advises about risks or negative consequences of certain actions.
+```
