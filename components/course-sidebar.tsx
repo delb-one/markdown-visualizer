@@ -10,7 +10,19 @@ import {
   Book,
   LibraryBig,
   Library,
+  MoreVertical,
+  Plus,
+  Pencil,
+  Trash2,
 } from "lucide-react";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+  ContextMenuGroup,
+} from "@/components/ui/context-menu";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -144,67 +156,111 @@ export function CourseSidebar({
                 key={course.id}
                 className="flex w-full flex-col items-center"
               >
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => toggleCollapsedCourse(course.id)}
-                      className={cn(
-                        "flex h-10 w-full items-center justify-center gap-1 rounded-md transition-colors ",
-                        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                        expandedCollapsedCourses.has(course.id)
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : "text-muted-foreground",
-                      )}
-                      aria-label={`Toggle notes for ${course.title}`}
-                    >
-                      <span className="text-[11px] font-semibold leading-none">
-                        {expandedCollapsedCourses.has(course.id) ? (
-                          <BookOpen className="h-4 w-4 shrink-0" />
-                        ) : (
-                          <Book className="h-4 w-4 shrink-0" />
-                        )}{" "}
-                      </span>
-                      {/* {expandedCollapsedCourses.has(course.id) ? (
-                        <ChevronDown className="h-3 w-3 shrink-0" />
-                      ) : (
-                        <ChevronRight className="h-3 w-3 shrink-0" />
-                      )} */}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" sideOffset={8}>
-                    <p className="font-medium">{course.title}</p>
-                  </TooltipContent>
-                </Tooltip>
-
-                {expandedCollapsedCourses.has(course.id) && (
-                  <div className="mt-1 flex w-full flex-col items-center gap-2">
-                    {course.notes.map((note, noteIndex) => (
-                      <Tooltip key={`${course.id}-${note.id}`}>
+                <ContextMenu>
+                  <ContextMenuTrigger asChild>
+                    <div>
+                      <Tooltip>
                         <TooltipTrigger asChild>
                           <button
-                            onClick={() => onSelectNote(course, note)}
+                            onClick={() => toggleCollapsedCourse(course.id)}
                             className={cn(
-                              "flex size-10 items-center justify-center rounded-md transition-colors",
+                              "flex size-10 h-10 items-center justify-center gap-1 rounded-md transition-colors ",
                               "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                              selectedNote?.id === note.id
-                                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                              expandedCollapsedCourses.has(course.id)
+                                ? "bg-sidebar-accent text-sidebar-accent-foreground"
                                 : "text-muted-foreground",
                             )}
-                            aria-label={`${course.title} - ${note.title}`}
+                            aria-label={`Toggle notes for ${course.title}`}
                           >
                             <span className="text-[11px] font-semibold leading-none">
-                              {/* <FileText className="h-3.5 w-3.5 shrink-0" />{" "} */}
-                              {noteIndex + 1}
+                              {expandedCollapsedCourses.has(course.id) ? (
+                                <BookOpen className="h-4 w-4 shrink-0" />
+                              ) : (
+                                <Book className="h-4 w-4 shrink-0" />
+                              )}{" "}
                             </span>
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="right" sideOffset={8}>
-                          <p className="font-medium">{note.title}</p>
-                          <p className="text-[11px] opacity-80">
-                            {course.title}
-                          </p>
+                          <p className="font-medium">{course.title}</p>
                         </TooltipContent>
                       </Tooltip>
+                    </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-48">
+                    <ContextMenuGroup>
+                      <LessonManager course={course} onSuccess={onCoursesChange}>
+                        <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+                          <Plus className="mr-2 h-4 w-4" />
+                          <span>Add Lesson</span>
+                        </ContextMenuItem>
+                      </LessonManager>
+                      <CourseManager course={course} onSuccess={onCoursesChange}>
+                        <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          <span>Edit Course</span>
+                        </ContextMenuItem>
+                      </CourseManager>
+                    </ContextMenuGroup>
+                    <ContextMenuSeparator />
+                    <DeleteCourseDialog course={course} onSuccess={onCoursesChange}>
+                      <ContextMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>Delete Course</span>
+                      </ContextMenuItem>
+                    </DeleteCourseDialog>
+                  </ContextMenuContent>
+                </ContextMenu>
+
+                {expandedCollapsedCourses.has(course.id) && (
+                  <div className="mt-1 flex w-full flex-col items-center gap-2">
+                    {course.notes.map((note, noteIndex) => (
+                      <ContextMenu key={`${course.id}-${note.id}`}>
+                        <ContextMenuTrigger asChild>
+                          <div>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={() => onSelectNote(course, note)}
+                                  className={cn(
+                                    "flex size-7 items-center justify-center rounded-md transition-colors",
+                                    "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                                    selectedNote?.id === note.id
+                                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                                      : "text-muted-foreground",
+                                  )}
+                                  aria-label={`${course.title} - ${note.title}`}
+                                >
+                                  <span className="text-[11px] font-semibold leading-none">
+                                    {noteIndex + 1}
+                                  </span>
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent side="right" sideOffset={8}>
+                                <p className="font-medium">{note.title}</p>
+                                <p className="text-[11px] opacity-80">
+                                  {course.title}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent  className="w-48">
+                          <LessonManager course={course} lesson={note} onSuccess={onCoursesChange}>
+                            <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              <span>Edit Lesson</span>
+                            </ContextMenuItem>
+                          </LessonManager>
+                          <ContextMenuSeparator />
+                          <DeleteLessonDialog course={course} lesson={note} onSuccess={onCoursesChange}>
+                            <ContextMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Delete Lesson</span>
+                            </ContextMenuItem>
+                          </DeleteLessonDialog>
+                        </ContextMenuContent>
+                      </ContextMenu>
                     ))}
                   </div>
                 )}
@@ -215,55 +271,100 @@ export function CourseSidebar({
           <div className="p-2">
             {filteredCourses.map((course) => (
               <div key={course.id} className="mb-1 group/course">
-                <div
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-md pr-1 transition-colors",
-                    selectedCourse?.id === course.id && !selectedNote
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "hover:bg-sidebar-accent/50 text-sidebar-foreground",
-                  )}
-                >
-                  <button
-                    onClick={() => {
-                      toggleCourse(course.id);
-                    }}
-                    className="flex flex-1 items-center gap-2 pl-3 py-2 text-sm font-medium"
-                  >
-                    {expandedCourses.has(course.id) ? (
-                      <ChevronDown className="h-4 w-4 shrink-0" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4 shrink-0" />
-                    )}
-                    <BookOpen className="h-4 w-4 shrink-0" />
-                    <span className="truncate flex-1 text-left">{course.title}</span>
-                  </button>
-                  <div className="opacity-0 group-hover/course:opacity-100 transition-opacity flex items-center pr-1">
-                    <LessonManager course={course} onSuccess={onCoursesChange} />
-                    <DeleteCourseDialog course={course} onSuccess={onCoursesChange} />
-                  </div>
-                </div>
+                <ContextMenu>
+                  <ContextMenuTrigger asChild>
+                    <div
+                      className={cn(
+                        "flex w-full items-center gap-2 rounded-md pr-1 transition-colors",
+                        selectedCourse?.id === course.id && !selectedNote
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                          : "hover:bg-sidebar-accent/50 text-sidebar-foreground",
+                      )}
+                    >
+                      <button
+                        onClick={() => {
+                          toggleCourse(course.id);
+                        }}
+                        className="flex flex-1 items-center gap-2 pl-3 py-2 text-sm font-medium"
+                      >
+                        {expandedCourses.has(course.id) ? (
+                          <ChevronDown className="h-4 w-4 shrink-0" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 shrink-0" />
+                        )}
+                        <BookOpen className="h-4 w-4 shrink-0" />
+                        <span className="truncate flex-1 text-left">{course.title}</span>
+                      </button>
+                      <div className="opacity-0 group-hover/course:opacity-100 transition-opacity flex items-center pr-1 text-muted-foreground/50">
+                        <MoreVertical className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-48">
+                    <ContextMenuGroup>
+                      <LessonManager course={course} onSuccess={onCoursesChange}>
+                        <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+                          <Plus className="mr-2 h-4 w-4" />
+                          <span>Add Lesson</span>
+                        </ContextMenuItem>
+                      </LessonManager>
+                      <CourseManager course={course} onSuccess={onCoursesChange}>
+                        <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          <span>Edit Course</span>
+                        </ContextMenuItem>
+                      </CourseManager>
+                    </ContextMenuGroup>
+                    <ContextMenuSeparator />
+                    <DeleteCourseDialog course={course} onSuccess={onCoursesChange}>
+                      <ContextMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>Delete Course</span>
+                      </ContextMenuItem>
+                    </DeleteCourseDialog>
+                  </ContextMenuContent>
+                </ContextMenu>
 
                 {expandedCourses.has(course.id) && (
                   <div className="ml-4 mt-1 space-y-1">
                     {course.notes.map((note) => (
-                      <div key={note.id} className="group/lesson flex w-full items-center pr-2">
-                        <button
-                          onClick={() => onSelectNote(course, note)}
-                          className={cn(
-                            "flex flex-1 items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
-                            "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                            selectedNote?.id === note.id
-                              ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                              : "text-muted-foreground",
-                          )}
-                        >
-                          <FileText className="h-3.5 w-3.5 shrink-0" />
-                          <span className="truncate">{note.title}</span>
-                        </button>
-                        <div className="opacity-0 group-hover/lesson:opacity-100 transition-opacity">
-                          <DeleteLessonDialog course={course} lesson={note} onSuccess={onCoursesChange} />
-                        </div>
-                      </div>
+                      <ContextMenu key={note.id}>
+                        <ContextMenuTrigger asChild>
+                          <div className="group/lesson flex w-full items-center pr-2">
+                            <button
+                              onClick={() => onSelectNote(course, note)}
+                              className={cn(
+                                "flex flex-1 items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+                                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                                selectedNote?.id === note.id
+                                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                                  : "text-muted-foreground",
+                              )}
+                            >
+                              <FileText className="h-3.5 w-3.5 shrink-0" />
+                              <span className="truncate">{note.title}</span>
+                            </button>
+                            <div className="opacity-0 group-hover/lesson:opacity-100 transition-opacity text-muted-foreground/50">
+                              <MoreVertical className="h-3.5 w-3.5" />
+                            </div>
+                          </div>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent className="w-48">
+                          <LessonManager course={course} lesson={note} onSuccess={onCoursesChange}>
+                            <ContextMenuItem onSelect={(e) => e.preventDefault()}>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              <span>Edit Lesson</span>
+                            </ContextMenuItem>
+                          </LessonManager>
+                          <ContextMenuSeparator />
+                          <DeleteLessonDialog course={course} lesson={note} onSuccess={onCoursesChange}>
+                            <ContextMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Delete Lesson</span>
+                            </ContextMenuItem>
+                          </DeleteLessonDialog>
+                        </ContextMenuContent>
+                      </ContextMenu>
                     ))}
                   </div>
                 )}

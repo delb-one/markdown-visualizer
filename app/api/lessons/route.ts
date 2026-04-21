@@ -80,3 +80,54 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Failed to delete lesson" }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { courseId, oldId, id, title, fileName } = body;
+
+    if (!courseId || !oldId || !id || !title || !fileName) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const data = fs.readFileSync(coursesJsonPath, "utf8");
+    const courses = JSON.parse(data);
+
+    const courseIndex = courses.findIndex((c: any) => c.id === courseId);
+    if (courseIndex === -1) {
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    }
+
+    const lessonIndex = courses[courseIndex].notes.findIndex((n: any) => n.id === oldId);
+    if (lessonIndex === -1) {
+      return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
+    }
+
+    const oldFileName = courses[courseIndex].notes[lessonIndex].fileName;
+
+    // Check for conflicts if ID or fileName changed
+    if (id !== oldId && courses[courseIndex].notes.some((n: any) => n.id === id)) {
+       return NextResponse.json({ error: "New Lesson ID already exists" }, { status: 400 });
+    }
+    if (fileName !== oldFileName && courses[courseIndex].notes.some((n: any) => n.fileName === fileName)) {
+       return NextResponse.json({ error: "New File Name already exists" }, { status: 400 });
+    }
+
+    // Update lesson
+    courses[courseIndex].notes[lessonIndex] = { id, title, fileName };
+    fs.writeFileSync(coursesJsonPath, JSON.stringify(courses, null, 2), "utf8");
+
+    // Rename file if needed
+    if (fileName !== oldFileName) {
+      const oldPath = path.join(coursesDirPath, courseId, oldFileName);
+      const newPath = path.join(coursesDirPath, courseId, fileName);
+      if (fs.existsSync(oldPath)) {
+        fs.renameSync(oldPath, newPath);
+      }
+    }
+
+    return NextResponse.json(courses[courseIndex].notes[lessonIndex]);
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to update lesson" }, { status: 500 });
+  }
+}

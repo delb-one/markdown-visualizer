@@ -5,14 +5,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FilePlus } from "lucide-react";
-import { Course } from "@/lib/courses";
+import { FilePlus, Pencil } from "lucide-react";
+import { Course, Note } from "@/lib/courses";
+import { cn } from "@/lib/utils";
 
-export function LessonManager({ course, onSuccess }: { course: Course, onSuccess: () => void }) {
+export function LessonManager({ course, lesson, onSuccess, children }: { course: Course, lesson?: Note, onSuccess: () => void, children?: React.ReactNode }) {
+  const isEdit = !!lesson;
   const [open, setOpen] = useState(false);
-  const [id, setId] = useState("");
-  const [title, setTitle] = useState("");
-  const [fileName, setFileName] = useState("");
+  const [id, setId] = useState(lesson?.id || "");
+  const [title, setTitle] = useState(lesson?.title || "");
+  const [fileName, setFileName] = useState(lesson?.fileName || "");
   const [loading, setLoading] = useState(false);
 
   // Auto-fill file name based on ID
@@ -28,15 +30,23 @@ export function LessonManager({ course, onSuccess }: { course: Course, onSuccess
     setLoading(true);
     try {
       const res = await fetch("/api/lessons", {
-        method: "POST",
+        method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId: course.id, id, title, fileName })
+        body: JSON.stringify({ 
+          courseId: course.id, 
+          oldId: isEdit ? lesson.id : undefined,
+          id, 
+          title, 
+          fileName 
+        })
       });
       if (res.ok) {
         setOpen(false);
-        setId("");
-        setTitle("");
-        setFileName("");
+        if (!isEdit) {
+          setId("");
+          setTitle("");
+          setFileName("");
+        }
         onSuccess();
       } else {
         const d = await res.json();
@@ -50,23 +60,30 @@ export function LessonManager({ course, onSuccess }: { course: Course, onSuccess
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md text-sidebar-foreground/50 transition-colors" aria-label="Add Lesson">
-                <FilePlus className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-          </TooltipTrigger>
-          <TooltipContent side="top">
-            <p>Add Lesson</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      {children ? (
+        <DialogTrigger asChild>{children}</DialogTrigger>
+      ) : (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className={cn(
+                  "h-6 w-6 ml-auto hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-colors",
+                  isEdit ? "text-muted-foreground/50 h-8 w-8" : "text-sidebar-foreground/50"
+                )} aria-label={isEdit ? "Edit Lesson" : "Add Lesson"}>
+                  {isEdit ? <Pencil className="h-3.5 w-3.5" /> : <FilePlus className="h-4 w-4" />}
+                </Button>
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>{isEdit ? "Edit Lesson" : "Add Lesson"}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Lesson to {course.title}</DialogTitle>
+          <DialogTitle>{isEdit ? `Edit Lesson in ${course.title}` : `Add Lesson to ${course.title}`}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

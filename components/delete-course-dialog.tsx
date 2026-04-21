@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { Course } from "@/lib/courses";
 
-export function DeleteCourseDialog({ course, onSuccess }: { course: Course, onSuccess: () => void }) {
+export function DeleteCourseDialog({ course, onSuccess, children }: { course: Course, onSuccess: () => void, children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -31,22 +31,26 @@ export function DeleteCourseDialog({ course, onSuccess }: { course: Course, onSu
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-             <div onClick={e => e.stopPropagation()}>
-               <DialogTrigger asChild>
-                 <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md text-sidebar-foreground/50 transition-colors" aria-label="Delete Course">
-                   <Trash2 className="h-4 w-4" />
-                 </Button>
-               </DialogTrigger>
-             </div>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <p>Delete Course</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      {children ? (
+        <DialogTrigger asChild>{children}</DialogTrigger>
+      ) : (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div onClick={e => e.stopPropagation()}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md text-sidebar-foreground/50 transition-colors" aria-label="Delete Course">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>Delete Course</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
       <DialogContent onClick={e => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Delete Course</DialogTitle>

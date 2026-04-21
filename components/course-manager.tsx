@@ -5,29 +5,33 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FolderPlus } from "lucide-react";
+import { FolderPlus, Pencil } from "lucide-react";
+import { Course } from "@/lib/courses";
 
-export function CourseManager({ onSuccess }: { onSuccess: () => void }) {
+export function CourseManager({ course, onSuccess, children }: { course?: Course; onSuccess: () => void; children?: React.ReactNode }) {
+  const isEdit = !!course;
   const [open, setOpen] = useState(false);
-  const [id, setId] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [id, setId] = useState(course?.id || "");
+  const [title, setTitle] = useState(course?.title || "");
+  const [description, setDescription] = useState(course?.description || "");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("/api/courses", {
-        method: "POST",
+      const res = await fetch(isEdit ? `/api/courses/${course.id}` : "/api/courses", {
+        method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, title, description })
       });
       if (res.ok) {
         setOpen(false);
-        setId("");
-        setTitle("");
-        setDescription("");
+        if (!isEdit) {
+          setId("");
+          setTitle("");
+          setDescription("");
+        }
         onSuccess();
       } else {
         const d = await res.json();
@@ -41,23 +45,27 @@ export function CourseManager({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Add Course">
-                <FolderPlus className="w-5 h-5" />
-              </Button>
-            </DialogTrigger>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <p>Add Course</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      {children ? (
+        <DialogTrigger asChild>{children}</DialogTrigger>
+      ) : (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label={isEdit ? "Edit Course" : "Add Course"} className={isEdit ? "h-8 w-8 text-muted-foreground hover:text-foreground" : ""}>
+                  {isEdit ? <Pencil className="w-4 h-4" /> : <FolderPlus className="w-5 h-5" />}
+                </Button>
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent side={isEdit ? "top" : "right"}>
+              <p>{isEdit ? "Edit Course" : "Add Course"}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Course</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit Course" : "Add Course"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
