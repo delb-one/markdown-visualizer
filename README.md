@@ -4,7 +4,25 @@ This application uses **Markdown files** to manage courses and lessons in a simp
 
 Each course is represented by a dedicated folder containing `.md` lesson files and is registered through a central configuration file.
 
+## 🚀 Getting Started
 
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd markdown-course-viewer
+   ```
+
+2. **Install dependencies:**
+   This project uses `npm` as the package manager.
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## 🧠 Key Concepts
 
