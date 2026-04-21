@@ -135,7 +135,7 @@ export default function Home() {
         </header>
 
         {/* Content Area */}
-        <main className="min-w-0 flex-1 overflow-hidden z-10 relative">
+        <main className="min-w-0 flex-1 overflow-hidden z-10 relative has-[.w-md-editor-fullscreen]:z-30">
           {selectedNote ? (
             isLoading ? (
               <div className="flex h-full items-center justify-center">

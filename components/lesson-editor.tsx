@@ -43,7 +43,7 @@ export function LessonEditor({ courseId, fileName, initialContent, onSave, onCan
   };
 
   return (
-    <div className="flex flex-col h-full w-full pt-14">
+    <div className="flex flex-col h-full w-full pt-14 has-[.w-md-editor-fullscreen]:relative has-[.w-md-editor-fullscreen]:z-[99999]">
       <div className="flex items-center justify-end gap-2 p-2 px-4 border-b border-border/70 bg-background/60 backdrop-blur-md">
         <Button variant="ghost" onClick={onCancel} disabled={loading}>Cancel</Button>
         <Button onClick={handleSave} disabled={loading}>{loading ? "Saving..." : "Save Changes"}</Button>
@@ -54,6 +54,7 @@ export function LessonEditor({ courseId, fileName, initialContent, onSave, onCan
             onChange={(val) => setValue(val || "")}
             height="100%"
             preview="live"
+            className="[&.w-md-editor-fullscreen]:!z-[99999]"
             style={{ borderRadius: 0, border: 'none', height: '100%' }}
           />
       </div>
