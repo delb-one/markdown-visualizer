@@ -18,7 +18,7 @@ export default function Home() {
   const [noteContent, setNoteContent] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
 
   const reloadCourses = async () => {

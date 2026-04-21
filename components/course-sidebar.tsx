@@ -8,7 +8,6 @@ import {
   FileText,
   Search,
   Book,
-  LibraryBig,
   Library,
   MoreVertical,
   Plus,
@@ -54,7 +53,7 @@ export function CourseSidebar({
   onSelectCourse,
   onSelectNote,
   onCoursesChange = () => {},
-  collapsed = false,
+  collapsed = true,
 }: CourseSidebarProps) {
   const [expandedCourses, setExpandedCourses] = useState<Set<string>>(
     new Set(selectedCourse ? [selectedCourse.id] : []),
@@ -120,7 +119,25 @@ export function CourseSidebar({
             collapsed && "justify-center",
           )}
         >
-          <Library className="h-5 w-5 shrink-0 text-sidebar-foreground" />
+          {collapsed ? (
+            <CourseManager onSuccess={onCoursesChange}>
+              <button 
+                className="flex size-10 items-center justify-center rounded-md hover:bg-sidebar-accent p-1 transition-colors"
+                aria-label="Add Course"
+              >
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Library className="h-5 w-5 shrink-0 text-sidebar-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" sideOffset={8}>
+                    <p className="font-medium">Add Course</p>
+                  </TooltipContent>
+                </Tooltip>
+              </button>
+            </CourseManager>
+          ) : (
+            <Library className="h-5 w-5 shrink-0 text-sidebar-foreground" />
+          )}
           <h1
             className={cn(
               "ml-2 whitespace-nowrap font-semibold text-sidebar-foreground transition-opacity duration-150",
