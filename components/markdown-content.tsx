@@ -6,7 +6,7 @@ import { useMemo, useRef, useCallback } from "react";
 import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github.css";
+// import "highlight.js/styles/github.css";
 import { CodeBlock } from "./code-block";
 import { MarkdownTabs, TabItem } from "./markdown-tabs";
 import {
@@ -16,7 +16,7 @@ import {
   MessageCircleWarningIcon,
   OctagonAlertIcon,
 } from "lucide-react";
-// import "highlight.js/styles/github-dark.css";
+import { useTheme } from "next-themes";
 
 interface MarkdownContentProps {
   content: string;
@@ -28,15 +28,7 @@ type ContentSegment =
   | { type: "markdown"; content: string }
   | { type: "tabs"; tabs: TabItem[] };
 
-/**
- * Detects tab groups in markdown content.
- * Pattern: a line with only bold text (e.g. **CLI**) followed by at least 2 blank lines,
- * then content until the next tab header or end of the tab group.
- *
- * Tab groups end when we encounter:
- * - A heading (# ## ###)
- * - Two consecutive blank lines not followed by a bold-only line (end of group)
- */
+// Parse the markdown content into segments
 function parseContentWithTabs(content: string): ContentSegment[] {
   const lines = content.split("\n");
   const segments: ContentSegment[] = [];
@@ -50,7 +42,10 @@ function parseContentWithTabs(content: string): ContentSegment[] {
 
     if (!inTabsBlock && /^\s*\[tabs\]\s*$/.test(line)) {
       if (currentMarkdownBuffer.length > 0) {
-        segments.push({ type: "markdown", content: currentMarkdownBuffer.join("\n") });
+        segments.push({
+          type: "markdown",
+          content: currentMarkdownBuffer.join("\n"),
+        });
         currentMarkdownBuffer = [];
       }
       inTabsBlock = true;
@@ -68,7 +63,10 @@ function parseContentWithTabs(content: string): ContentSegment[] {
         if (!currentTabLabel) return;
 
         let start = 0;
-        while (start < currentTabContentBuffer.length && currentTabContentBuffer[start].trim() === "") {
+        while (
+          start < currentTabContentBuffer.length &&
+          currentTabContentBuffer[start].trim() === ""
+        ) {
           start++;
         }
         let end = currentTabContentBuffer.length;
@@ -118,7 +116,10 @@ function parseContentWithTabs(content: string): ContentSegment[] {
   }
 
   if (currentMarkdownBuffer.length > 0) {
-    segments.push({ type: "markdown", content: currentMarkdownBuffer.join("\n") });
+    segments.push({
+      type: "markdown",
+      content: currentMarkdownBuffer.join("\n"),
+    });
   }
 
   return segments;
@@ -127,6 +128,25 @@ function parseContentWithTabs(content: string): ContentSegment[] {
 export function MarkdownContent({ content, title }: MarkdownContentProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = React.useState<string | null>(null);
+  const { resolvedTheme } = useTheme();
+
+  React.useEffect(() => {
+    const themeName = resolvedTheme === "dark" ? "night-owl" : "github";
+    const href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/${themeName}.min.css`;
+
+    let link = document.getElementById("hljs-theme-link") as HTMLLinkElement;
+    if (!link) {
+      link = document.createElement("link");
+      link.id = "hljs-theme-link";
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    
+    // Only update if it changed to avoid unnecessary re-paints
+    if (link.href !== href) {
+      link.href = href;
+    }
+  }, [resolvedTheme]);
 
   const handleScrollToHeading = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -203,213 +223,227 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
   }, [headings]);
 
   // Shared component overrides for ReactMarkdown
-  const markdownComponents: Components = useMemo(() => ({
-    h1: ({ children }) => {
-      const id = String(children)
-        .toLowerCase()
-        .replace(/[^\w]+/g, "-");
-      return (
-        <h1 id={id} className="scroll-mt-8 font-sans">
-          {children}
-        </h1>
-      );
-    },
-    h2: ({ children }) => {
-      const id = String(children)
-        .toLowerCase()
-        .replace(/[^\w]+/g, "-");
-      return (
-        <h2 id={id} className="scroll-mt-8 font-sans">
-          {children}
-        </h2>
-      );
-    },
-    h3: ({ children }) => {
-      const id = String(children)
-        .toLowerCase()
-        .replace(/[^\w]+/g, "-");
-      return (
-        <h3 id={id} className="scroll-mt-8 font-sans">
-          {children}
-        </h3>
-      );
-    },
-    code: ({ className, children, ...props }) => {
-      const isInline = !className;
-
-      if (isInline) {
+  const markdownComponents: Components = useMemo(
+    () => ({
+      h1: ({ children }) => {
+        const id = String(children)
+          .toLowerCase()
+          .replace(/[^\w]+/g, "-");
         return (
-          <code
-            className="break-all rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
-            {...props}
-          >
+          <h1 id={id} className="scroll-mt-8 font-sans">
+            {children}
+          </h1>
+        );
+      },
+      h2: ({ children }) => {
+        const id = String(children)
+          .toLowerCase()
+          .replace(/[^\w]+/g, "-");
+        return (
+          <h2 id={id} className="scroll-mt-8 font-sans">
+            {children}
+          </h2>
+        );
+      },
+      h3: ({ children }) => {
+        const id = String(children)
+          .toLowerCase()
+          .replace(/[^\w]+/g, "-");
+        return (
+          <h3 id={id} className="scroll-mt-8 font-sans">
+            {children}
+          </h3>
+        );
+      },
+      code: ({ className, children, ...props }) => {
+        const isInline = !className;
+
+        if (isInline) {
+          return (
+            <code
+              className="break-all rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
+              {...props}
+            >
+              {children}
+            </code>
+          );
+        }
+
+        return (
+          <code className={`${className} font-mono text-sm`} {...props}>
             {children}
           </code>
         );
-      }
+      },
 
-      return (
-        <code
-          className={`${className} font-mono text-sm`}
-          {...props}
-        >
+      pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
+
+      table: ({ children }) => (
+        <div className="max-w-full overflow-x-auto rounded-lg border border-border">
+          <table className="w-full mt-0! mb-0!">{children}</table>
+        </div>
+      ),
+      th: ({ children }) => (
+        <th className="border-b border-border bg-muted/50 px-4 py-3 text-left font-semibold">
           {children}
-        </code>
-      );
-    },
+        </th>
+      ),
+      td: ({ children }) => (
+        <td className="border-b border-border px-4 py-3">{children}</td>
+      ),
+      blockquote: ({ children }) => {
+        // Detect GitHub-style alerts: [!NOTE], [!TIP], [!WARNING], [!IMPORTANT], [!CAUTION]
+        const alertTypes: Record<
+          string,
+          {
+            icon: React.ReactNode;
+            label: string;
+            borderClass: string;
+            bgClass: string;
+            titleClass: string;
+          }
+        > = {
+          NOTE: {
+            icon: <InfoIcon className="h-5 w-5" />,
+            label: "Note",
+            borderClass: "border-blue-500",
+            bgClass: "bg-blue-500/10",
+            titleClass: "text-blue-500",
+          },
+          TIP: {
+            icon: <LightbulbIcon className="h-5 w-5" />,
+            label: "Tip",
+            borderClass: "border-green-500",
+            bgClass: "bg-green-500/10",
+            titleClass: "text-green-500",
+          },
+          IMPORTANT: {
+            icon: <MessageCircleWarningIcon className="h-5 w-5" />,
+            label: "Important",
+            borderClass: "border-purple-500",
+            bgClass: "bg-purple-500/10",
+            titleClass: "text-purple-500",
+          },
+          WARNING: {
+            icon: <AlertTriangleIcon className="h-5 w-5" />,
+            label: "Warning",
+            borderClass: "border-yellow-500",
+            bgClass: "bg-yellow-500/10",
+            titleClass: "text-yellow-500",
+          },
+          CAUTION: {
+            icon: <OctagonAlertIcon className="h-5 w-5" />,
+            label: "Caution",
+            borderClass: "border-red-500",
+            bgClass: "bg-red-500/10",
+            titleClass: "text-red-500",
+          },
+        };
 
-    pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
+        // Extract text from React children recursively
+        const extractText = (node: React.ReactNode): string => {
+          if (typeof node === "string") return node;
+          if (typeof node === "number") return String(node);
+          if (!node) return "";
+          if (Array.isArray(node)) return node.map(extractText).join("");
+          if (React.isValidElement(node) && node.props) {
+            return extractText(
+              (node.props as { children?: React.ReactNode }).children,
+            );
+          }
+          return "";
+        };
 
-    table: ({ children }) => (
-      <div className="max-w-full overflow-x-auto rounded-lg border border-border">
-        <table className="w-full mt-0! mb-0!">{children}</table>
-      </div>
-    ),
-    th: ({ children }) => (
-      <th className="border-b border-border bg-muted/50 px-4 py-3 text-left font-semibold">
-        {children}
-      </th>
-    ),
-    td: ({ children }) => (
-      <td className="border-b border-border px-4 py-3">
-        {children}
-      </td>
-    ),
-    blockquote: ({ children }) => {
-      // Detect GitHub-style alerts: [!NOTE], [!TIP], [!WARNING], [!IMPORTANT], [!CAUTION]
-      const alertTypes: Record<string, { icon: React.ReactNode; label: string; borderClass: string; bgClass: string; titleClass: string }> = {
-        NOTE: {
-          icon: <InfoIcon className="h-5 w-5" />,
-          label: "Note",
-          borderClass: "border-blue-500",
-          bgClass: "bg-blue-500/10",
-          titleClass: "text-blue-500",
-        },
-        TIP: {
-          icon: <LightbulbIcon className="h-5 w-5" />,
-          label: "Tip",
-          borderClass: "border-green-500",
-          bgClass: "bg-green-500/10",
-          titleClass: "text-green-500",
-        },
-        IMPORTANT: {
-          icon: <MessageCircleWarningIcon className="h-5 w-5" />,
-          label: "Important",
-          borderClass: "border-purple-500",
-          bgClass: "bg-purple-500/10",
-          titleClass: "text-purple-500",
-        },
-        WARNING: {
-          icon: <AlertTriangleIcon className="h-5 w-5" />,
-          label: "Warning",
-          borderClass: "border-yellow-500",
-          bgClass: "bg-yellow-500/10",
-          titleClass: "text-yellow-500",
-        },
-        CAUTION: {
-          icon: <OctagonAlertIcon className="h-5 w-5" />,
-          label: "Caution",
-          borderClass: "border-red-500",
-          bgClass: "bg-red-500/10",
-          titleClass: "text-red-500",
-        },
-      };
+        // Check first paragraph for alert marker
+        const childArray = React.Children.toArray(children);
+        let alertType: string | null = null;
 
-      // Extract text from React children recursively
-      const extractText = (node: React.ReactNode): string => {
-        if (typeof node === "string") return node;
-        if (typeof node === "number") return String(node);
-        if (!node) return "";
-        if (Array.isArray(node)) return node.map(extractText).join("");
-        if (React.isValidElement(node) && node.props) {
-          return extractText((node.props as { children?: React.ReactNode }).children);
-        }
-        return "";
-      };
-
-      // Check first paragraph for alert marker
-      const childArray = React.Children.toArray(children);
-      let alertType: string | null = null;
-
-      for (const child of childArray) {
-        if (React.isValidElement(child)) {
-          const text = extractText(child);
-          const match = text.match(/^\[!(NOTE|TIP|WARNING|IMPORTANT|CAUTION)\]\s*/);
-          if (match) {
-            alertType = match[1];
-            break;
+        for (const child of childArray) {
+          if (React.isValidElement(child)) {
+            const text = extractText(child);
+            const match = text.match(
+              /^\[!(NOTE|TIP|WARNING|IMPORTANT|CAUTION)\]\s*/,
+            );
+            if (match) {
+              alertType = match[1];
+              break;
+            }
           }
         }
-      }
 
-      if (alertType && alertTypes[alertType]) {
-        const config = alertTypes[alertType];
-        const markerRegex = new RegExp(`^\\[!${alertType}\\]\\s*`);
+        if (alertType && alertTypes[alertType]) {
+          const config = alertTypes[alertType];
+          const markerRegex = new RegExp(`^\\[!${alertType}\\]\\s*`);
 
-        // Remove the [!TYPE] marker from children
-        const filteredChildren = childArray.map((child) => {
-          if (!React.isValidElement(child)) return child;
-          const text = extractText(child);
-          if (markerRegex.test(text)) {
-            const remaining = text.replace(markerRegex, "").trim();
-            if (!remaining) return null; // The paragraph only contained the marker
-            // Clone the element with the marker text removed from children
-            return React.cloneElement(child as React.ReactElement<{ children?: React.ReactNode }>, {
-              children: remaining,
-            });
-          }
-          return child;
-        }).filter(Boolean);
+          // Remove the [!TYPE] marker from children
+          const filteredChildren = childArray
+            .map((child) => {
+              if (!React.isValidElement(child)) return child;
+              const text = extractText(child);
+              if (markerRegex.test(text)) {
+                const remaining = text.replace(markerRegex, "").trim();
+                if (!remaining) return null; // The paragraph only contained the marker
+                // Clone the element with the marker text removed from children
+                return React.cloneElement(
+                  child as React.ReactElement<{ children?: React.ReactNode }>,
+                  {
+                    children: remaining,
+                  },
+                );
+              }
+              return child;
+            })
+            .filter(Boolean);
+
+          return (
+            <div
+              className={`not-italic border-l-4 ${config.borderClass} ${config.bgClass} rounded-r-lg my-6 px-4 py-3`}
+            >
+              <div
+                className={`flex items-center gap-2 font-semibold ${config.titleClass} mb-2`}
+              >
+                {config.icon}
+                {config.label}
+              </div>
+              <div className="text-sm [&>p]:mt-2 [&>p:first-child]:mt-0">
+                {filteredChildren}
+              </div>
+            </div>
+          );
+        }
 
         return (
-          <div className={`not-italic border-l-4 ${config.borderClass} ${config.bgClass} rounded-r-lg my-6 px-4 py-3`}>
-            <div className={`flex items-center gap-2 font-semibold ${config.titleClass} mb-2`}>
-              {config.icon}
-              {config.label}
-            </div>
-            <div className="text-sm [&>p]:mt-2 [&>p:first-child]:mt-0">
-              {filteredChildren}
-            </div>
-          </div>
+          <blockquote className="border-l-4 border-primary/30 bg-muted/30 pl-4 py-1 italic">
+            {children}
+          </blockquote>
         );
-      }
-
-      return (
-        <blockquote className="border-l-4 border-primary/30 bg-muted/30 pl-4 py-1 italic">
+      },
+      ul: ({ children }) => (
+        <ul className="my-4 ml-6 list-disc space-y-2">{children}</ul>
+      ),
+      ol: ({ children }) => (
+        <ol className="my-4 ml-6 list-decimal space-y-2">{children}</ol>
+      ),
+      li: ({ children }) => (
+        <li className="wrap-break-word leading-7">{children}</li>
+      ),
+      a: ({ href, children }) => (
+        <a
+          href={href}
+          className="wrap-break-word font-medium text-primary underline underline-offset-4 hover:text-primary/80"
+          target={href?.startsWith("http") ? "_blank" : undefined}
+          rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+        >
           {children}
-        </blockquote>
-      );
-    },
-    ul: ({ children }) => (
-      <ul className="my-4 ml-6 list-disc space-y-2">{children}</ul>
-    ),
-    ol: ({ children }) => (
-      <ol className="my-4 ml-6 list-decimal space-y-2">
-        {children}
-      </ol>
-    ),
-    li: ({ children }) => (
-      <li className="wrap-break-word leading-7">{children}</li>
-    ),
-    a: ({ href, children }) => (
-      <a
-        href={href}
-        className="wrap-break-word font-medium text-primary underline underline-offset-4 hover:text-primary/80"
-        target={href?.startsWith("http") ? "_blank" : undefined}
-        rel={
-          href?.startsWith("http")
-            ? "noopener noreferrer"
-            : undefined
-        }
-      >
-        {children}
-      </a>
-    ),
-    p: ({ children }) => (
-      <p className="wrap-break-word leading-7 not-first:mt-6">{children}</p>
-    ),
-    hr: () => <hr className="my-8 border-border" />,
-  }), []);
+        </a>
+      ),
+      p: ({ children }) => (
+        <p className="wrap-break-word leading-7 not-first:mt-6">{children}</p>
+      ),
+      hr: () => <hr className="my-8 border-border" />,
+    }),
+    [],
+  );
 
   const renderMarkdown = useCallback(
     (md: string) => (
@@ -430,24 +464,24 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
         ref={scrollAreaRef}
         className="min-w-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-          <article className="prose min-w-0 max-w-full px-8 pb-8 pt-20 lg:px-8 lg:pb-8 lg:pt-20">
-            {segments.map((segment, index) => {
-              if (segment.type === "tabs") {
-                return (
-                  <MarkdownTabs
-                    key={index}
-                    tabs={segment.tabs}
-                    renderMarkdown={renderMarkdown}
-                  />
-                );
-              }
+        <article className="prose min-w-0 max-w-full px-8 pb-8 pt-20 lg:px-8 lg:pb-8 lg:pt-20">
+          {segments.map((segment, index) => {
+            if (segment.type === "tabs") {
               return (
-                <React.Fragment key={index}>
-                  {renderMarkdown(segment.content)}
-                </React.Fragment>
+                <MarkdownTabs
+                  key={index}
+                  tabs={segment.tabs}
+                  renderMarkdown={renderMarkdown}
+                />
               );
-            })}
-          </article>
+            }
+            return (
+              <React.Fragment key={index}>
+                {renderMarkdown(segment.content)}
+              </React.Fragment>
+            );
+          })}
+        </article>
       </div>
 
       {headings.length > 1 && (
