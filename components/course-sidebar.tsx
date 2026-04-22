@@ -144,7 +144,7 @@ export function CourseSidebar({
               collapsed && "pointer-events-none absolute opacity-0",
             )}
           >
-            Course Notes
+            My Notes
           </h1>
           {!collapsed && (
             <div className="ml-auto flex items-center pr-1  group-hover:opacity-100 transition-opacity">

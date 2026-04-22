@@ -67,5 +67,11 @@
         "fileName": "9-best-practice.md"
       }
     ]
+  },
+  {
+    "id": "helpdesk-it",
+    "title": "Helpdesk-IT",
+    "description": "Introduction to helpdesk-it and ticketing procedure",
+    "notes": []
   }
 ]
