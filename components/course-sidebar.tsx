@@ -13,6 +13,7 @@ import {
   Plus,
   Pencil,
   Trash2,
+  FolderPlus,
 } from "lucide-react";
 import {
   ContextMenu,
@@ -52,7 +53,7 @@ export function CourseSidebar({
   selectedNote,
   onSelectCourse,
   onSelectNote,
-  onCoursesChange = () => {},
+  onCoursesChange = () => { },
   collapsed = true,
 }: CourseSidebarProps) {
   const [expandedCourses, setExpandedCourses] = useState<Set<string>>(
@@ -87,10 +88,10 @@ export function CourseSidebar({
     );
   const collapsedItems = selectedCourse
     ? selectedCourse.notes.map((note, noteIndex) => ({
-        course: selectedCourse,
-        note,
-        chapterNumber: `${noteIndex + 1}`,
-      }))
+      course: selectedCourse,
+      note,
+      chapterNumber: `${noteIndex + 1}`,
+    }))
     : [];
 
   const toggleCollapsedCourse = (courseId: string) => {
@@ -121,13 +122,13 @@ export function CourseSidebar({
         >
           {collapsed ? (
             <CourseManager onSuccess={onCoursesChange}>
-              <button 
+              <button
                 className="flex size-10 items-center justify-center rounded-md hover:bg-sidebar-accent p-1 transition-colors"
                 aria-label="Add Course"
               >
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Library className="h-5 w-5 shrink-0 text-sidebar-foreground" />
+                    <FolderPlus className="h-5 w-5" />
                   </TooltipTrigger>
                   <TooltipContent side="right" sideOffset={8}>
                     <p className="font-medium">Add Course</p>
@@ -144,7 +145,7 @@ export function CourseSidebar({
               collapsed && "pointer-events-none absolute opacity-0",
             )}
           >
-            My Notes
+            Zen Notes
           </h1>
           {!collapsed && (
             <div className="ml-auto flex items-center pr-1  group-hover:opacity-100 transition-opacity">
@@ -262,7 +263,7 @@ export function CourseSidebar({
                             </Tooltip>
                           </div>
                         </ContextMenuTrigger>
-                        <ContextMenuContent  className="w-48">
+                        <ContextMenuContent className="w-48">
                           <LessonManager course={course} lesson={note} onSuccess={onCoursesChange}>
                             <ContextMenuItem onSelect={(e) => e.preventDefault()}>
                               <Pencil className="mr-2 h-4 w-4" />

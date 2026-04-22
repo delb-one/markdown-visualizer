@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { PanelLeftClose, PanelLeftOpen, Pencil } from "lucide-react"
+import { Download, PanelLeftClose, PanelLeftOpen, Pencil } from "lucide-react"
 import { CourseSidebar } from "@/components/course-sidebar"
 import { MarkdownContent } from "@/components/markdown-content"
 import { EmptyState } from "@/components/empty-state"
@@ -10,6 +10,7 @@ import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Button } from "@/components/ui/button"
 import { courses as initialCourses, getNoteContent, type Course, type Note } from "@/lib/courses"
 import { LessonEditor } from "@/components/lesson-editor"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function Home() {
   const [coursesList, setCoursesList] = useState<Course[]>(initialCourses)
@@ -67,9 +68,8 @@ export default function Home() {
     <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden shrink-0 transition-[width] duration-200 lg:block ${
-          sidebarCollapsed ? "w-20" : "w-72"
-        }`}
+        className={`hidden shrink-0 transition-[width] duration-200 lg:block ${sidebarCollapsed ? "w-20" : "w-72"
+          }`}
       >
         <CourseSidebar
           courses={coursesList}
@@ -125,11 +125,39 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2">
             {selectedNote && !isEditing && (
-              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                <Pencil className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsEditing(true)}
+                    className="h-9 w-9"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side='left'>
+                  <p>Edit</p>
+                </TooltipContent>
+              </Tooltip>
             )}
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => console.log("Export to pdf")}
+                  className="h-9 w-9"
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Export to PDF</p>
+              </TooltipContent>
+            </Tooltip>
+
             <ThemeToggle />
           </div>
         </header>
