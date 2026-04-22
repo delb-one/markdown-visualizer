@@ -125,39 +125,40 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2">
             {selectedNote && !isEditing && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsEditing(true)}
-                    className="h-9 w-9"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side='left'>
-                  <p>Edit</p>
-                </TooltipContent>
-              </Tooltip>
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsEditing(true)}
+                      className="h-9 w-9"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side='left'>
+                    <p>Edit</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => console.log("Export to pdf")}
+                      className="h-9 w-9"
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Export to PDF</p>
+                  </TooltipContent>
+                </Tooltip>
+              </>
             )}
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => console.log("Export to pdf")}
-                  className="h-9 w-9"
-                >
-                  <Download className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Export to PDF</p>
-              </TooltipContent>
-            </Tooltip>
-
             <ThemeToggle />
           </div>
         </header>
