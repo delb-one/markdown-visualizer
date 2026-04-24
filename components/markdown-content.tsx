@@ -15,12 +15,23 @@ import {
   AlertTriangleIcon,
   MessageCircleWarningIcon,
   OctagonAlertIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { Button } from "./ui/button";
 
 interface MarkdownContentProps {
   content: string;
   title?: string;
+  previousNote?: {
+    title: string;
+    onClick: () => void;
+  };
+  nextNote?: {
+    title: string;
+    onClick: () => void;
+  };
 }
 
 // A segment is either normal markdown text or a tab group
@@ -125,7 +136,12 @@ function parseContentWithTabs(content: string): ContentSegment[] {
   return segments;
 }
 
-export function MarkdownContent({ content, title }: MarkdownContentProps) {
+export function MarkdownContent({
+  content,
+  title,
+  previousNote,
+  nextNote,
+}: MarkdownContentProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const { resolvedTheme } = useTheme();
@@ -464,7 +480,11 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
         ref={scrollAreaRef}
         className="min-w-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <article className="prose min-w-0 max-w-full px-8 pb-8 pt-20 lg:px-8 lg:pb-8 lg:pt-20">
+        <article
+          className={`prose min-w-0 max-w-full px-8 pt-20 lg:px-8 lg:pt-20 ${
+            previousNote || nextNote ? "pb-28 lg:pb-32" : "pb-8 lg:pb-8"
+          }`}
+        >
           {segments.map((segment, index) => {
             if (segment.type === "tabs") {
               return (
@@ -482,6 +502,50 @@ export function MarkdownContent({ content, title }: MarkdownContentProps) {
             );
           })}
         </article>
+        {(previousNote || nextNote) && (
+          <nav
+            className="sticky bottom-0 z-20  bg-background/95 px-8 py-4 backdrop-blur supports-backdrop-filter:bg-background/80 lg:px-8"
+            aria-label="Note navigation"
+          >
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {previousNote ? (
+                <Button
+                  variant="outline"
+                  className="h-auto min-h-16 w-full justify-start p-4 text-left"
+                  onClick={previousNote.onClick}
+                >
+                  <ChevronLeftIcon className="mr-2 h-4 w-4 shrink-0" />
+                  <span className="flex min-w-0 flex-col">
+                    <span className="text-xs text-muted-foreground">
+                      Previous
+                    </span>
+                    <span className="truncate">{previousNote.title}</span>
+                  </span>
+                </Button>
+              ) : (
+                <div className="hidden sm:block" />
+              )}
+
+              {nextNote ? (
+                <Button
+                  variant="outline"
+                  className="h-auto min-h-16 w-full justify-end p-4 text-right"
+                  onClick={nextNote.onClick}
+                >
+                  <span className="flex min-w-0 flex-col">
+                    <span className="text-xs text-muted-foreground">
+                      Next
+                    </span>
+                    <span className="truncate">{nextNote.title}</span>
+                  </span>
+                  <ChevronRightIcon className="ml-2 h-4 w-4 shrink-0" />
+                </Button>
+              ) : (
+                <div className="hidden sm:block" />
+              )}
+            </div>
+          </nav>
+        )}
       </div>
 
       {headings.length > 1 && (

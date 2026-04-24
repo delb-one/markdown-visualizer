@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Download, PanelLeftClose, PanelLeftOpen, Pencil } from "lucide-react"
+import { Download, FileText, PanelLeftClose, PanelLeftOpen, Pencil } from "lucide-react"
 import { CourseSidebar } from "@/components/course-sidebar"
 import { MarkdownContent } from "@/components/markdown-content"
 import { EmptyState } from "@/components/empty-state"
@@ -11,6 +11,12 @@ import { Button } from "@/components/ui/button"
 import { courses as initialCourses, getNoteContent, type Course, type Note } from "@/lib/courses"
 import { LessonEditor } from "@/components/lesson-editor"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Home() {
   const [coursesList, setCoursesList] = useState<Course[]>(initialCourses)
@@ -63,6 +69,27 @@ export default function Home() {
     setSelectedCourse(course)
     setSelectedNote(note)
   }
+
+  const handleExportPlaceholder = (format: "pdf" | "docs") => {
+    console.log(`Export placeholder: ${format}`)
+  }
+
+  const selectedNoteIndex =
+    selectedCourse && selectedNote
+      ? selectedCourse.notes.findIndex((note) => note.id === selectedNote.id)
+      : -1
+
+  const previousNote =
+    selectedCourse && selectedNoteIndex > 0
+      ? selectedCourse.notes[selectedNoteIndex - 1]
+      : null
+
+  const nextNote =
+    selectedCourse &&
+      selectedNoteIndex >= 0 &&
+      selectedNoteIndex < selectedCourse.notes.length - 1
+      ? selectedCourse.notes[selectedNoteIndex + 1]
+      : null
 
   return (
     <div className="flex h-screen bg-background">
@@ -142,21 +169,35 @@ export default function Home() {
                   </TooltipContent>
                 </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => console.log("Export to pdf")}
-                      className="h-9 w-9"
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Export to PDF</p>
-                  </TooltipContent>
-                </Tooltip>
+                <DropdownMenu>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9"
+                          aria-label="Export"
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Export as</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={() => handleExportPlaceholder("pdf")}>
+                      <FileText className="mr-2 w-4 h-4" />
+                      PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => handleExportPlaceholder("docs")}>
+                      <FileText className="mr-2 w-4 h-4" />
+                      .docs
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             )}
             <ThemeToggle />
@@ -185,6 +226,22 @@ export default function Home() {
               <MarkdownContent
                 content={noteContent}
                 title={selectedNote.title}
+                previousNote={
+                  selectedCourse && previousNote
+                    ? {
+                        title: previousNote.title,
+                        onClick: () => handleSelectNote(selectedCourse, previousNote),
+                      }
+                    : undefined
+                }
+                nextNote={
+                  selectedCourse && nextNote
+                    ? {
+                        title: nextNote.title,
+                        onClick: () => handleSelectNote(selectedCourse, nextNote),
+                      }
+                    : undefined
+                }
               />
             )
           ) : (
