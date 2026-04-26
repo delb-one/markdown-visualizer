@@ -14,10 +14,10 @@ export async function GET(
     
     const filePath = path.join(coursesDirPath, courseId, fileName);
     
-    console.log("[v0] Attempting to read file:", filePath);
+    console.log("Attempting to read file:", filePath);
     
     if (!fs.existsSync(filePath)) {
-      console.log("[v0] File not found:", filePath);
+      console.log("File not found:", filePath);
       return NextResponse.json(
         { error: "Note not found" },
         { status: 404 }
@@ -25,7 +25,7 @@ export async function GET(
     }
     
     const content = fs.readFileSync(filePath, "utf-8");
-    console.log("[v0] Successfully read file, length:", content.length);
+    console.log("Successfully read file, length:", content.length);
     
     return new NextResponse(content, {
       headers: {
@@ -33,7 +33,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("[v0] Error reading note:", error);
+    console.error("Error reading note:", error);
     return NextResponse.json(
       { error: "Failed to read note" },
       { status: 500 }

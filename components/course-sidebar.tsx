@@ -56,6 +56,18 @@ export function CourseSidebar({
   onCoursesChange = () => { },
   collapsed = true,
 }: CourseSidebarProps) {
+  const MAX_TITLE_LENGTH = 30;
+
+  const truncateTitle = (title: string, maxLength: number) => {
+    if (title.length <= maxLength) {
+      console.log(title);
+      
+      return title;
+    }
+
+    return `${title.slice(0, maxLength - 3)}...`;
+  };
+
   const [expandedCourses, setExpandedCourses] = useState<Set<string>>(
     new Set(selectedCourse ? [selectedCourse.id] : []),
   );
@@ -205,7 +217,7 @@ export function CourseSidebar({
                       </Tooltip>
                     </div>
                   </ContextMenuTrigger>
-                  <ContextMenuContent className="w-48">
+                  <ContextMenuContent forceMount className="w-48">
                     <ContextMenuGroup>
                       <LessonManager course={course} onSuccess={onCoursesChange}>
                         <ContextMenuItem onSelect={(e) => e.preventDefault()}>
@@ -263,7 +275,7 @@ export function CourseSidebar({
                             </Tooltip>
                           </div>
                         </ContextMenuTrigger>
-                        <ContextMenuContent className="w-48">
+                        <ContextMenuContent forceMount className="w-48">
                           <LessonManager course={course} lesson={note} onSuccess={onCoursesChange}>
                             <ContextMenuItem onSelect={(e) => e.preventDefault()}>
                               <Pencil className="mr-2 h-4 w-4" />
@@ -311,14 +323,16 @@ export function CourseSidebar({
                           <ChevronRight className="h-4 w-4 shrink-0" />
                         )}
                         <BookOpen className="h-4 w-4 shrink-0" />
-                        <span className="truncate flex-1 text-left">{course.title}</span>
+                        <span className="truncate flex-1 text-left">
+                          {truncateTitle(course.title, MAX_TITLE_LENGTH)}
+                        </span>
                       </button>
                       <div className="opacity-0 group-hover/course:opacity-100 transition-opacity flex items-center pr-1 text-muted-foreground/50">
                         <MoreVertical className="h-4 w-4" />
                       </div>
                     </div>
                   </ContextMenuTrigger>
-                  <ContextMenuContent className="w-48">
+                  <ContextMenuContent forceMount className="w-48">
                     <ContextMenuGroup>
                       <LessonManager course={course} onSuccess={onCoursesChange}>
                         <ContextMenuItem onSelect={(e) => e.preventDefault()}>
@@ -360,14 +374,16 @@ export function CourseSidebar({
                               )}
                             >
                               <FileText className="h-3.5 w-3.5 shrink-0" />
-                              <span className="truncate">{note.title}</span>
+                              <span className="truncate">
+                                {truncateTitle(note.title, MAX_TITLE_LENGTH)}
+                              </span>
                             </button>
                             <div className="opacity-0 group-hover/lesson:opacity-100 transition-opacity text-muted-foreground/50">
                               <MoreVertical className="h-3.5 w-3.5" />
                             </div>
                           </div>
                         </ContextMenuTrigger>
-                        <ContextMenuContent className="w-48">
+                        <ContextMenuContent forceMount className="w-48">
                           <LessonManager course={course} lesson={note} onSuccess={onCoursesChange}>
                             <ContextMenuItem onSelect={(e) => e.preventDefault()}>
                               <Pencil className="mr-2 h-4 w-4" />
@@ -400,3 +416,4 @@ export function CourseSidebar({
     </div>
   );
 }
+
