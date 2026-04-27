@@ -178,7 +178,7 @@ export function CourseSidebar({
         )}
       </div>
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 overflow-y-auto ">
         {collapsed ? (
           <div className="flex flex-col items-center gap-1 p-2">
             {courses.map((course) => (

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
 
 interface MarkdownContentProps {
   content: string;
@@ -295,7 +296,7 @@ export function MarkdownContent({
       pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
 
       table: ({ children }) => (
-        <div className="max-w-full overflow-x-auto rounded-lg border border-border">
+        <div className="max-w-full overflow-x-auto rounded-lg border border-border mb-4">
           <table className="w-full mt-0! mb-0!">{children}</table>
         </div>
       ),
@@ -549,6 +550,10 @@ export function MarkdownContent({
       </div>
 
       {headings.length > 1 && (
+        <ScrollArea className="overflow-y-auto">
+
+
+
         <aside className="hidden w-56 shrink-0 border-l border-border p-6 xl:block">
           <h4 className="mb-4 mt-10 text-sm font-semibold text-foreground">
             On this page
@@ -571,6 +576,8 @@ export function MarkdownContent({
             ))}
           </nav>
         </aside>
+
+        </ScrollArea>
       )}
     </div>
   );
